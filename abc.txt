@@ -1,0 +1,17 @@
+start 100
+mover bregs asd
+sub aregs =6
+add aregs =5
+sub aregs =6
+sub1 1 2 32
+ltorg
+movem cregs =3
+mover bregs asd
+origin 103
+sub aregs =6
+mover bregs sd
+sd dc 3
+add1 44 55
+asd ds 2
+sub1 98 99 78
+end

@@ -1,0 +1,93 @@
+#Trigger
+
+create table library(
+    book_id int primary key,
+    book_name varchar(20),
+    book_price int
+    );
+
+desc library;
+ 
+create table library_audit_row(
+    book_id int references library(book_id),
+    book_name varchar(20),
+    book_price int,
+    audit_change varchar(20),
+    update_time date
+    );
+
+desc  library_audit_row;
+ 
+create table library_audit_stmp(
+    audit_history_id int primary key,
+    audit_change varchar(20),
+    user_name varchar(20),
+    update_time date
+    );
+
+ desc library_audit_stmp;
+ 
+insert into library values(1, 'Harry Potter', 250);
+
+insert into library values(2, 'Davinci code', 500);
+
+insert into library values(3, 'Game of thrones', 1000);
+
+insert into library values(4, 'SQL plus book', 1500);
+
+insert into library values(5, 'Mathematics book', 2000);
+
+ select * from library;
+
+
+create or replace trigger library_trigger
+after
+update or delete on library
+for each row
+declare
+audit_change varchar(10);
+begin
+if deleting then
+audit_change := 'delete';
+end if;
+if updating then
+audit_change := 'update';
+end if;
+insert into library_audit_row
+values(:old.book_id, :old.book_name, :old.book_price, audit_change, current_timestamp);
+end;
+
+
+update library set book_name='HP' where book_id=2;
+
+select * from library_audit_row;
+
+delete from library where book_id=5;
+
+
+
+ select * from library_audit_row;
+
+ create sequence audit_seq start with 1;
+
+
+create or replace trigger trig50
+before update or delete on library
+declare
+audit_change varchar(20);
+begin
+if deleting then
+audit_change := 'delete';
+end if;
+if updating then
+audit_change := 'update';
+end if;
+insert into library_audit_stmp
+values(audit_seq.nextval, audit_change, USER, current_timestamp);
+end;
+
+update library set book_name = 'Java book' where book_id = 3;
+
+select * from library_audit_stmp;
+
+select * from library_audit_row;
